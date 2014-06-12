@@ -9,7 +9,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class ConfigActivity extends Activity {
-	static String IP_ADDRESS = "NOT SET";
+	//static String IP_ADDRESS = "NOT SET";
+	static String IP_ADDRESS = "192.168.1.100";
+	
 	
 	Button button1;
 	EditText editText1;
