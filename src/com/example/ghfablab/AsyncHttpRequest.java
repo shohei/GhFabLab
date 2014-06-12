@@ -60,16 +60,17 @@ public class AsyncHttpRequest extends AsyncTask<Uri.Builder, Void, String> {
         	multipartEntity.addPart("product[location]", new StringBody(location,Charset.forName("UTF-8")));
         	multipartEntity.addPart("product[note]", new StringBody(note,Charset.forName("UTF-8")));
         	
-        	File imgFile = new File(image_filepath);
-        	//FileBody fileBody = new FileBody(imgFile.getAbsoluteFile(), "image/jpeg");
-        	//FileBody fileBody = new FileBody(imgFile, "image/jpeg","UTF-8");
-        	//FileBody fileBody = new FileBody(imgFile, "application/octet-stream","UTF-8");
-        	
-        	FileInputStream in = new FileInputStream(imgFile);
-        	InputStreamBody streamBody = new InputStreamBody(in, "image/jpeg","shutter_plugin_sample.jpg");
-        	//multipartEntity.addPart("product[photo]", fileBody);
-        	multipartEntity.addPart("product[photo]", streamBody);
-        	
+        	if(image_filepath != ""){
+	        	File imgFile = new File(image_filepath);
+	        	//FileBody fileBody = new FileBody(imgFile.getAbsoluteFile(), "image/jpeg");
+	        	//FileBody fileBody = new FileBody(imgFile, "image/jpeg","UTF-8");
+	        	//FileBody fileBody = new FileBody(imgFile, "application/octet-stream","UTF-8");
+	        	
+	        	FileInputStream in = new FileInputStream(imgFile);
+	        	InputStreamBody streamBody = new InputStreamBody(in, "image/jpeg","shutter_plugin_sample.jpg");
+	        	//multipartEntity.addPart("product[photo]", fileBody);
+	        	multipartEntity.addPart("product[photo]", streamBody);
+        	}
         	//UrlEncodedFormEntity ent = new UrlEncodedFormEntity((List<? extends NameValuePair>) multipartEntity,HTTP.UTF_8);
         	httpPost.setEntity(multipartEntity);
         	//httpPost.setEntity(ent);

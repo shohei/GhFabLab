@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,9 +22,9 @@ public class RegisterActivity extends Activity {
 	Button button1,button2;
 	ImageView imageView1;
 	static String SERVER_IP,NAME,QUANTITY,LOCATION,NOTE;
-	static String image_path;
+	static String image_path="";
 	EditText editText1,editText2,editText3,editText4;
-	
+	 private Uri imageUri;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -73,19 +74,52 @@ public class RegisterActivity extends Activity {
 		});
 	}
 
+	/*
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+	  //if(resultCode != RESULT_CANCELED){
 		if(REQUEST_CAPTURE_IMAGE == requestCode 
 			&& resultCode == Activity.RESULT_OK ){
-			Bitmap capturedImage = 
-				(Bitmap) data.getExtras().get("data");
-			imageView1.setImageBitmap(capturedImage);
+			   if (data!=null && data.getData()!=null) {  
+	    			Bitmap capturedImage = 
+	    				(Bitmap) data.getExtras().get("data");
+	    				imageView1.setImageBitmap(capturedImage);
+	    				Uri selectedImageUri = data.getData();
+	    				image_path = getRealPathFromURI(selectedImageUri);
+			   } else {  
+	                //Xperia以外の場合  
+	            }  
+	        } 
+			//showToast(image_path);
+		  }
+	  */
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // experiaとそれ以外で処理を分ける
+        Uri pictureUri = (data != null && data.getData() != null) ? data.getData() : imageUri;
+        if (pictureUri == null) {
+            // IS03とかだとUriが取れないらしく、サムネイルクラスのしょぼい画像を取得するしかない
+            Bitmap capturedImage = (Bitmap) data.getExtras().get("data");
+            imageView1.setImageBitmap(capturedImage);
 			Uri selectedImageUri = data.getData();
 			image_path = getRealPathFromURI(selectedImageUri);
-			//showToast(image_path);
-		}
-	  }
-	
+            return;
+        }
+        // 標準ギャラリーにスキャンさせる
+        MediaScannerConnection.scanFile( // API Level 8
+                this, // Context
+                new String[]{pictureUri.getPath()},
+                new String[]{"image/jpeg"},
+                null);
+        
+        int orientation = ImageUtil.getOrientation(pictureUri);
+        // 回転方向を取得して適切に回転させる
+
+        Bitmap capturedImage = ImageUtil.createBitmapFromUri(this, pictureUri);
+        imageView1.setImageBitmap(capturedImage);
+		Uri selectedImageUri = data.getData();
+		image_path = getRealPathFromURI(selectedImageUri);
+    }  
 
 	
 	 protected void showToast(String message){

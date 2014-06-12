@@ -24,8 +24,11 @@ public class MainActivity extends ListActivity {
 	
 	protected void onListItemClick(ListView l, View v, int position, long id){
 		 //Toast.makeText(this, activities[position], Toast.LENGTH_SHORT).show();	
-			Intent intent = new Intent();
+			//FOR ANDROID 4(shohei)
+		    Intent intent = new Intent();
 			intent.setClassName("com.example.ghfablab","com.example.ghfablab."+activities[position]);
+			//FOR OTHERS
+			 //Intent intent = new Intent(this, RegisterActivity.class); 
 			startActivity(intent);	
 	}
 		
