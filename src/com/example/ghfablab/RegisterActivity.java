@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -19,8 +20,9 @@ public class RegisterActivity extends Activity {
 	static final int REQUEST_CAPTURE_IMAGE = 100;
 	Button button1,button2;
 	ImageView imageView1;
-	String SERVER_IP;
+	static String SERVER_IP,NAME,QUANTITY,LOCATION,NOTE;
 	static String image_path;
+	EditText editText1,editText2,editText3,editText4;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,11 @@ public class RegisterActivity extends Activity {
 		findViews();
 		setListeners();
 		button2 = (Button)findViewById(R.id.button2);
+		editText1 = (EditText)findViewById(R.id.editText1);
+		editText2 = (EditText)findViewById(R.id.editText2);
+		editText3 = (EditText)findViewById(R.id.editText3);
+		editText4 = (EditText)findViewById(R.id.editText4);
+		
 		button2.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
 				SERVER_IP = ConfigActivity.IP_ADDRESS;
@@ -38,7 +45,11 @@ public class RegisterActivity extends Activity {
 				} else {
 					//showAlert("Upload data","Server IP is"+SERVER_IP+". Are you sure to send?");					
 					showToast("Data is uploaded to server "+SERVER_IP);
-					AsyncHttpRequest task = new AsyncHttpRequest(this);
+					NAME = editText1.getText().toString();
+					QUANTITY = editText2.getText().toString();
+					LOCATION = editText3.getText().toString();
+					NOTE = editText4.getText().toString();
+					AsyncHttpRequest task = new AsyncHttpRequest(this,SERVER_IP,NAME,QUANTITY,LOCATION,NOTE,image_path);
 					task.execute();
 				}
 			  }

@@ -26,25 +26,31 @@ import android.view.View.OnClickListener;
 public class AsyncHttpRequest extends AsyncTask<Uri.Builder, Void, String> {
     
     private Activity mainActivity;
-
-    public AsyncHttpRequest(OnClickListener onClickListener) {
+    private String _ipaddr,_name, _quantity,_location,_note,_image_path;
+    
+    public AsyncHttpRequest(OnClickListener onClickListener,String ipaddr, String name,String quantity,String location,String note, String image_path) {
         // 呼び出し元のアクティビティ
         //this.mainActivity = onClickListener;
+    	this._ipaddr = ipaddr;
+    	this._name = name;
+    	this._quantity = quantity;
+    	this._location = location;
+    	this._note = note;
+    	this._image_path = image_path;
     }
     
-    // このメソッドは必ずオーバーライドする必要があるよ
-    // ここが非同期で処理される部分みたいたぶん。
-	protected String doInBackground(Builder... arg0) {
+	@Override
+	protected String doInBackground(android.net.Uri.Builder... arg0) {
 		// TODO Auto-generated method stub
-		post("http://192.168.1.100:3000/products","hogename","hogeq","hogeloc","hogenote",RegisterActivity.image_path);
+		post(_ipaddr,_name, _quantity,_location,_note,_image_path);
 		return null;
 	}
 
-	public void post(String url,String name, String quantity, String location, String note, String image_filepath) {
+	public void post(String ipaddr,String name, String quantity, String location, String note, String image_filepath) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpContext localContext = new BasicHttpContext();
         //HttpPost httpPost = new HttpPost(url);
-        HttpPost httpPost = new HttpPost("http://192.168.1.100:3000/products");
+        HttpPost httpPost = new HttpPost("http://"+ipaddr+":3000/products");
         httpPost.addHeader("content_type","image/jpeg");
         try {
         	MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE,null,Charset.forName("UTF-8"));
@@ -57,7 +63,7 @@ public class AsyncHttpRequest extends AsyncTask<Uri.Builder, Void, String> {
         	File imgFile = new File(image_filepath);
         	//FileBody fileBody = new FileBody(imgFile.getAbsoluteFile(), "image/jpeg");
         	//FileBody fileBody = new FileBody(imgFile, "image/jpeg","UTF-8");
-        	FileBody fileBody = new FileBody(imgFile, "application/octet-stream","UTF-8");
+        	//FileBody fileBody = new FileBody(imgFile, "application/octet-stream","UTF-8");
         	
         	FileInputStream in = new FileInputStream(imgFile);
         	InputStreamBody streamBody = new InputStreamBody(in, "image/jpeg","shutter_plugin_sample.jpg");
@@ -79,10 +85,8 @@ public class AsyncHttpRequest extends AsyncTask<Uri.Builder, Void, String> {
         //tv.setText(result)
     }
 
-	@Override
-	protected String doInBackground(android.net.Uri.Builder... arg0) {
+	protected String doInBackground(Builder... arg0) {
 		// TODO Auto-generated method stub
-		post("192.168.1.100","hogename","hogeq","hogeloc","hogenote",RegisterActivity.image_path);
 		return null;
 	}
 
