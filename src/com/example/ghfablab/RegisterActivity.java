@@ -1,15 +1,19 @@
 package com.example.ghfablab;
 
+import java.io.ByteArrayOutputStream;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -19,12 +23,13 @@ import android.widget.Toast;
 
 public class RegisterActivity extends Activity {
 	static final int REQUEST_CAPTURE_IMAGE = 100;
+	protected static final int PICK_FROM_CAMERA = 0;
 	Button button1,button2;
 	ImageView imageView1;
 	static String SERVER_IP,NAME,QUANTITY,LOCATION,NOTE;
 	static String image_path="";
 	EditText editText1,editText2,editText3,editText4;
-	 private Uri imageUri;
+	 private String imageUri="";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -65,11 +70,9 @@ public class RegisterActivity extends Activity {
 	protected void setListeners(){
 		button1.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
-				Intent intent = new Intent(
-					MediaStore.ACTION_IMAGE_CAPTURE);
-				startActivityForResult(
-					intent,
-					REQUEST_CAPTURE_IMAGE);
+				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				startActivityForResult(intent,REQUEST_CAPTURE_IMAGE);
+				//startActivityForResult(intent,PICK_FROM_CAMERA);
 			}
 		});
 	}
@@ -93,32 +96,31 @@ public class RegisterActivity extends Activity {
 			//showToast(image_path);
 		  }
 	  */
+	
+	public Uri getImageUri(Context inContext, Bitmap inImage) {
+		  ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		  inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+		  String path = Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+		  return Uri.parse(path);
+		}
+	
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // experiaとそれ以外で処理を分ける
-        Uri pictureUri = (data != null && data.getData() != null) ? data.getData() : imageUri;
-        if (pictureUri == null) {
-            // IS03とかだとUriが取れないらしく、サムネイルクラスのしょぼい画像を取得するしかない
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {	
+		// experiaとそれ以外で処理を分ける
+		Uri pictureUri = null;
+		if(data != null && data.getData() != null) {
             Bitmap capturedImage = (Bitmap) data.getExtras().get("data");
             imageView1.setImageBitmap(capturedImage);
 			Uri selectedImageUri = data.getData();
 			image_path = getRealPathFromURI(selectedImageUri);
             return;
-        }
-        // 標準ギャラリーにスキャンさせる
-        MediaScannerConnection.scanFile( // API Level 8
-                this, // Context
-                new String[]{pictureUri.getPath()},
-                new String[]{"image/jpeg"},
-                null);
+		} 
         
-        int orientation = ImageUtil.getOrientation(pictureUri);
-        // 回転方向を取得して適切に回転させる
-
-        Bitmap capturedImage = ImageUtil.createBitmapFromUri(this, pictureUri);
-        imageView1.setImageBitmap(capturedImage);
-		Uri selectedImageUri = data.getData();
+    	Bitmap capturedImage = data.getExtras().getParcelable("data");
+		imageView1.setImageBitmap(capturedImage);
+		Uri selectedImageUri = getImageUri(this,capturedImage);
 		image_path = getRealPathFromURI(selectedImageUri);
+
     }  
 
 	
